@@ -25,7 +25,7 @@
                 </span>
                 <h5>Editar OS</h5>
             </div>
-            <div class="widget-content nopadding tab-content">
+            <div class="widget-content nopadding">
                 <div class="span12" id="divProdutosServicos" style=" margin-left: 0">
                     <ul class="nav nav-tabs">
                         <li class="active" id="tabDetalhes"><a href="#tab1" data-toggle="tab">Detalhes da OS</a></li>
@@ -394,13 +394,13 @@
     <form id="formFaturar" action="<?php echo current_url() ?>" method="post">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">Faturar OS</h3>
+            <h3 id="myModalLabel">Faturar Venda</h3>
         </div>
         <div class="modal-body">
             <div class="span12 alert alert-info" style="margin-left: 0"> Obrigatório o preenchimento dos campos com asterisco.</div>
             <div class="span12" style="margin-left: 0">
                 <label for="descricao">Descrição</label>
-                <input class="span12" id="descricao" type="text" name="descricao" value="Fatura de OS - #<?php echo $result->idOs; ?> " />
+                <input class="span12" id="descricao" type="text" name="descricao" value="Fatura de Venda - #<?php echo $result->idOs; ?> " />
             </div>
             <div class="span12" style="margin-left: 0">
                 <div class="span12" style="margin-left: 0">
@@ -694,9 +694,6 @@
                                 title: "Atenção",
                                 text: "Ocorreu um erro ao tentar adicionar produto."
                             });
-                        },
-                        complete: function() {
-                            $("#idProduto").val('');
                         }
                     });
                     return false;
@@ -749,9 +746,6 @@
                             title: "Atenção",
                             text: "Ocorreu um erro ao tentar adicionar serviço."
                         });
-                    },
-                    complete: function() {
-                        $("#idServico").val('');
                     }
                 });
                 return false;

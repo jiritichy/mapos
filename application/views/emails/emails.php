@@ -5,7 +5,7 @@
         </span>
         <h5>Lista de envio de e-mails</h5>
     </div>
-    <div class="widget-content nopadding tab-content">
+    <div class="widget-content nopadding">
         <table class="table table-bordered ">
             <thead>
                 <tr style="backgroud-color: #2D335B">

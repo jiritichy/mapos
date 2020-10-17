@@ -57,24 +57,23 @@ class Mapos_model extends CI_Model
         $this->db->like('nomeCliente', $termo);
         $this->db->or_like('telefone', $termo);
         $this->db->or_like('celular', $termo);
-        $this->db->limit(15);
+        $this->db->limit(5);
         $data['clientes'] = $this->db->get('clientes')->result();
 
         // buscando os
         $this->db->like('idOs', $termo);
         $this->db->or_like('descricaoProduto', $termo);
-        $this->db->limit(15);
+        $this->db->limit(5);
         $data['os'] = $this->db->get('os')->result();
 
         // buscando produtos
-        $this->db->like('codDeBarra', $termo);
-        $this->db->or_like('descricao', $termo);
-        $this->db->limit(50);
+        $this->db->like('descricao', $termo);
+        $this->db->limit(5);
         $data['produtos'] = $this->db->get('produtos')->result();
 
         //buscando serviços
         $this->db->like('nome', $termo);
-        $this->db->limit(15);
+        $this->db->limit(5);
         $data['servicos'] = $this->db->get('servicos')->result();
 
         return $data;
@@ -135,29 +134,6 @@ class Mapos_model extends CI_Model
         $this->db->join('clientes', 'clientes.idClientes = os.clientes_id');
         $this->db->where('os.status', 'Aguardando Peças');
         $this->db->limit(10);
-        return $this->db->get()->result();
-    }
-
-    public function calendario($start, $end, $status = null)
-    {
-        $this->db->select(
-            'os.*,
-            clientes.nomeCliente,
-            COALESCE((SELECT SUM(produtos_os.preco * produtos_os.quantidade ) FROM produtos_os WHERE produtos_os.os_id = os.idOs), 0) totalProdutos,
-            COALESCE((SELECT SUM(servicos_os.preco * servicos_os.quantidade ) FROM servicos_os WHERE servicos_os.os_id = os.idOs), 0) totalServicos'
-        );
-        $this->db->from('os');
-        $this->db->join('clientes', 'clientes.idClientes = os.clientes_id');
-        $this->db->join('produtos_os', 'produtos_os.os_id = os.idOs', 'left');
-        $this->db->join('servicos_os', 'servicos_os.os_id = os.idOs', 'left');
-        $this->db->where('os.dataFinal >=', $start);
-        $this->db->where('os.dataFinal <=', $end);
-        $this->db->group_by('os.idOs');
-
-        if (! empty($status)) {
-            $this->db->where('os.status', $status);
-        }
-
         return $this->db->get()->result();
     }
 

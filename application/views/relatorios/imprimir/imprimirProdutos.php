@@ -22,7 +22,7 @@
                     <div class="widget-title">
                         <h4 style="text-align: center">Produtos</h4>
                     </div>
-                    <div class="widget-content nopadding tab-content">
+                    <div class="widget-content nopadding">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>

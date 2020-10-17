@@ -4,7 +4,7 @@
 /**
  * App current version
  */
-$config['app_version'] = '4.18.0';
+$config['app_version'] = '4.9.0';
 
 /**
  * Nome do sistema
@@ -39,7 +39,7 @@ $config['app_subname'] = 'Sistema de Controle de Ordens de Serviço';
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'enter_baseurl';
+$config['base_url'] = 'http://localhost:8080/mapos';
 
 /*
 |--------------------------------------------------------------------------
@@ -496,9 +496,3 @@ $config['time_reference'] = 'local';
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
-
-
-
-$config['modules_locations'] = [
-    APPPATH.'modules/' => '../modules/',
-];

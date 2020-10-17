@@ -1,0 +1,84 @@
+Este tutorial foi realizado em uma maquina com Ubuntu 24.04 LTS (Focal Fossa) e
+web server xampp 7.4.7.
+
+######################## INSTALAÇAO DO WEB SERVER E SERVIDOR MYSQL ########################
+
+* Obtenha o instalado do xampp, na epoca deste tutorial a ultima versao era a 7.4.7,
+para conferir a versao mais atualizada vá ate o link :
+	https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/
+*Encontre uma pasta com o maior numero de versao (no meu caso era 7.4.7) e 
+copie o endereço do link do arquivo .run
+
+*Use o wget para obter o pacote
+	$ wget https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/7.4.7/xampp-linux-x64-7.4.7-0-installer.run/download
+
+*Torne o arquivo executável com o comando abaixo
+	$ chmod +x xampp-installer.run
+
+*Inicie a instalação do XAMPP, com o seguinte comando
+	$ sudo ./xampp-installer.run
+
+* Durante a instalaçao, certifique-se de instalar o mysql juntamente com o xampp,
+logo apos instalado, digite o comando para abrir a interface de configuraçao do xampp
+usando o seguinte comando:
+	$ sudo /opt/lampp/lampp start
+
+* Inicie o webserver na porta desejada, e o mysql server
+
+*Para verificar se o webserver foi lançado corretamente, acesse a url http://localhost:PORTA
+	Ex: http://localhost:8181
+	
+	* Se aparecer a tela de boas vindas do xampp, a instalaçao foi bem sucedida
+
+*O xampp vem automaticamente com o PhpMyAdmin para gerenciar bancos MySql, 
+navegue até: http://IP:PORTA/phpmyadmin
+	ex: http://localhost:8181//phpmyadmin
+
+* Sera exibido a interface de configuraçao do phpmyadmin, crie um usuario, senha e um banco
+dando todas as permissoes necessarias ao usuario, para o sistema do mapOs (sera requisitado 
+na instalaçao do mapos)
+
+* O Web server e o servidor mySql foram instalados com exito
+
+#################################### INSTALANDO O MAPOS ####################################
+
+* Clone o diretorio dentro da pasta so seu webserver (no caso do xampp é a pasta htdocs)
+
+* Apos clonar entre dentro da pasta clonada, e realize a instalaçao do composer,
+	$ composer install --no-dev
+
+* Apos realizar a instalaçao via composer, navegue ate o index.php do seu projeto.
+	exemplo: http://localhost:80/mapos/index.php
+	
+	* Observe que este é um exemplo do xampp, localhost seria o ip do servidor, 
+	80 seria a porta do servidor, mapos seria a pasta clonada dentro de htdocs, 
+	index.php é a pagina inicial do mapos.
+	* Se por exemplo estiver instalando em um servidor na nuvem, cujo o IP é: 17.235.25.43,
+	e a porta do webserver fosse 8181, e por algum motivo foi renomeado a pasta clonada, para
+	AppOrdemDeServico, voce iria acessar a url
+		http://17.235.25.43:8181/AppOrdemDeServico/index.php
+	
+
+* Apos acessar a url, lhe sera mostrada uma tela de instalaçao rapida, digite os dados referentes
+ao mysql, os dados de acesso do admin padrao, e a url até a pasta raiz do projeto.
+Por exemplo se estiver em um servidor na nuvem, cujo o IP é: 17.235.25.43,e a porta do 
+webserver fosse 8181, e por algum motivo foi renomeado a pasta clonada, para AppOrdemDeServico, 
+voce iria colocar no campo url:
+	http://17.235.25.43:8181/AppOrdemDeServico
+ 
+* Apos isso, o web app já está instalado e é so acessar a url dele e utilizar suas funçoes
+
+#################################### INICIANDO O MAPOS ####################################
+
+* Para iniciar o mapos, é necessario subir o web server e o servidor mysql,digite 
+o comando para abrir a interface de configuraçao do xampp:
+	$ sudo /opt/lampp/lampp start
+
+* Inicie o webserver na porta desejada, e o mysql server
+
+* Acesse a URL do mapos,Se por exemplo estiver instalando em um servidor na nuvem, cujo o IP 
+é: 17.235.25.43 e a porta do webserver fosse 8181, e por algum motivo foi renomeado a pasta 
+clonada, para AppOrdemDeServico, voce iria acessar a url
+	http://17.235.25.43:8181/AppOrdemDeServico
+
+* 

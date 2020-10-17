@@ -62,10 +62,11 @@ class Relatorios extends MY_Controller
 
         $data['clientes'] = $this->Relatorios_model->clientesCustom($dataInicial, $dataFinal);
         $data['emitente'] = $this->Mapos_model->getEmitente();
-        $data['title'] = 'Relatório de Clientes Customizado';
+        $data['title'] = 'Relatório de Clientes Custumizado';
         $data['topo'] = $this->load->view('relatorios/imprimir/imprimirTopo', $data, true);
 
         $this->load->helper('mpdf');
+        //$this->load->view('relatorios/imprimir/imprimirClientes', $data);
         $html = $this->load->view('relatorios/imprimir/imprimirClientes', $data, true);
         pdf_create($html, 'relatorio_clientes' . date('d/m/y'), true);
     }
@@ -75,43 +76,6 @@ class Relatorios extends MY_Controller
         if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'rCliente')) {
             $this->session->set_flashdata('error', 'Você não tem permissão para gerar relatórios de clientes.');
             redirect(base_url());
-        }
-
-        $format = $this->input->get('format');
-
-        if ($format == 'xls') {
-            $clientes = $this->Relatorios_model->clientesRapid($array = true);
-            $cabecalho = [
-                'Código' => 'integer',
-                'Nome' => 'string',
-                'Sexo' => 'string',
-                'Pessoa Física' => 'string',
-                'Documento' => 'string',
-                'Telefone' => 'string',
-                'Celular' => 'string',
-                'E-mail' => 'string',
-                'Data de Cadastro' => 'YYYY-MM-DD',
-                'Rua' => 'string',
-                'Número' => 'string',
-                'Bairro' => 'string',
-                'Cidade' => 'string',
-                'Estado' => 'string',
-                'CEP' => 'string',
-                'Contato' => 'string',
-                'Complemento' => 'string',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($clientes as $cliente) {
-                $writer->writeSheetRow('Sheet1', $cliente);
-            }
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_clientes.xlsx', $arquivo);
-            return;
         }
 
         $data['clientes'] = $this->Relatorios_model->clientesRapid();
@@ -197,122 +161,6 @@ class Relatorios extends MY_Controller
         }
     }
 
-    public function sku()
-    {
-        if (!($this->permission->checkPermission($this->session->userdata('permissao'), 'rVenda')
-            && $this->permission->checkPermission($this->session->userdata('permissao'), 'rOs'))) {
-            $this->session->set_flashdata('error', 'Você não tem permissão para gerar relatório SKU.');
-            redirect(base_url());
-        }
-
-        $this->data['view'] = 'relatorios/rel_sku';
-        return $this->layout();
-    }
-
-    public function skuRapid()
-    {
-        if (!($this->permission->checkPermission($this->session->userdata('permissao'), 'rVenda')
-            && $this->permission->checkPermission($this->session->userdata('permissao'), 'rOs'))) {
-            $this->session->set_flashdata('error', 'Você não tem permissão para gerar relatório SKU.');
-            redirect(base_url());
-        }
-
-        $format = $this->input->get('format');
-
-        if ($format == 'xls') {
-            $vendas = $this->Relatorios_model->skuRapid(true);
-
-            $cabecalho = [
-                'ID Cliente' => 'integer',
-                'Nome Cliente' => 'string',
-                'ID Produto' => 'integer',
-                'Descrição Produto' => 'string',
-                'Quantidade' => 'integer',
-                'ID Relacionado' => 'integer',
-                'Data' => 'YYYY-MM-DD',
-                'Preço Unitário' => 'price',
-                'Preço Total' => 'price',
-                'Origem' => 'string'
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($vendas as $venda) {
-                $writer->writeSheetRow('Sheet1', $venda);
-            }
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_sku.xlsx', $arquivo);
-
-            return;
-        }
-
-        $data['resultados'] = $this->Relatorios_model->skuRapid();
-        $data['emitente'] = $this->Mapos_model->getEmitente();
-        $data['title'] = 'Relatório SKU';
-        $data['topo'] = $this->load->view('relatorios/imprimir/imprimirTopo', $data, true);
-
-        $this->load->helper('mpdf');
-        $html = $this->load->view('relatorios/imprimir/imprimirSKU', $data, true);
-        pdf_create($html, 'relatorio_produtos' . date('d/m/y'), true);
-    }
-
-    public function skuCustom()
-    {
-        if (!($this->permission->checkPermission($this->session->userdata('permissao'), 'rVenda')
-            && $this->permission->checkPermission($this->session->userdata('permissao'), 'rOs'))) {
-            $this->session->set_flashdata('error', 'Você não tem permissão para gerar relatório SKU.');
-            redirect(base_url());
-        }
-
-        $dataInicial = $this->input->get('dataInicial');
-        $dataFinal = $this->input->get('dataFinal');
-        $cliente = $this->input->get('clientes_id');
-        $format = $this->input->get('format');
-        $origem = $this->input->get('origem');
-
-        if ($format == 'xls') {
-            $vendas = $this->Relatorios_model->skuCustom($dataInicial, $dataFinal, $cliente, $origem, true);
-
-            $cabecalho = [
-                'ID Cliente' => 'integer',
-                'Nome Cliente' => 'string',
-                'ID Produto' => 'integer',
-                'Descrição Produto' => 'string',
-                'Quantidade' => 'integer',
-                'ID Relacionado' => 'integer',
-                'Data' => 'YYYY-MM-DD',
-                'Preço Unitário' => 'price',
-                'Preço Total' => 'price',
-                'Origem' => 'string'
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($vendas as $venda) {
-                $writer->writeSheetRow('Sheet1', $venda);
-            }
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_sku.xlsx', $arquivo);
-
-            return;
-        }
-
-        $data['resultados'] = $this->Relatorios_model->skuCustom($dataInicial, $dataFinal, $cliente, $origem);
-        $data['emitente'] = $this->Mapos_model->getEmitente();
-        $data['title'] = 'Relatório SKU';
-        $data['topo'] = $this->load->view('relatorios/imprimir/imprimirTopo', $data, true);
-
-        $this->load->helper('mpdf');
-        $html = $this->load->view('relatorios/imprimir/imprimirSKU', $data, true);
-        pdf_create($html, 'relatorio_produtos' . date('d/m/y'), true);
-    }
-
     public function servicos()
     {
         if (!$this->permission->checkPermission($this->session->userdata('permissao'), 'rServico')) {
@@ -377,77 +225,7 @@ class Relatorios extends MY_Controller
             redirect(base_url());
         }
 
-        $format = $this->input->get('format');
-
-        $isXls = $format === 'xls';
-        $os = $this->Relatorios_model->osRapid($isXls);
-        $totalProdutos = 0;
-        $totalServicos = 0;
-        foreach ($os as $o) {
-            $totalProdutos += $isXls
-                ? floatval($o['total_produto'])
-                : floatval($o->total_produto);
-            $totalServicos += $isXls
-                ? floatval($o['total_servico'])
-                : floatval($o->total_servico);
-        }
-
-        if ($isXls) {
-            $osFormatadas = array_map(function ($item) {
-                $total = floatval($item['total_servico']) + floatval($item['total_produto']);
-
-                return [
-                    'idOs' => $item['idOs'],
-                    'nomeCliente' => $item['nomeCliente'],
-                    'status' => $item['status'],
-                    'dataFinal' => $item['dataInicial'],
-                    'descricaoProduto' => $item['descricaoProduto'],
-                    'total_produto' => $item['total_produto'] ? $item['total_produto'] : 0,
-                    'total_servico' => $item['total_servico'] ? $item['total_servico'] : 0,
-                    'valorTotal' => $total ? $total : 0,
-                ];
-            }, $os);
-
-            $cabecalho = [
-                'ID OS' => 'integer',
-                'Cliente' => 'string',
-                'Status' => 'string',
-                'Data' => 'YYYY-MM-DD',
-                'Descrição' => 'string',
-                'Total Produtos' => 'price',
-                'Total Serviços' => 'price',
-                'Total' => 'price',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($osFormatadas as $os) {
-                $writer->writeSheetRow('Sheet1', $os);
-            }
-            $writer->writeSheetRow('Sheet1', []);
-            $writer->writeSheetRow('Sheet1', [
-                null,
-                null,
-                null,
-                null,
-                null,
-                $totalProdutos,
-                $totalServicos,
-                $totalProdutos + $totalServicos,
-            ]);
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_os.xlsx', $arquivo);
-
-            return;
-        }
-
-        $data['os'] = $os;
-        $data['total_produtos'] = $totalProdutos;
-        $data['total_servicos'] = $totalServicos;
-        $data['total_geral'] = $totalProdutos + $totalServicos;
+        $data['os'] = $this->Relatorios_model->osRapid();
         $data['emitente'] = $this->Mapos_model->getEmitente();
         $data['title'] = 'Relatório de OS';
         $data['topo'] = $this->load->view('relatorios/imprimir/imprimirTopo', $data, true);
@@ -469,86 +247,18 @@ class Relatorios extends MY_Controller
         $cliente = $this->input->get('cliente');
         $responsavel = $this->input->get('responsavel');
         $status = $this->input->get('status');
-        $format = $this->input->get('format');
-
-        $isXls = $format === 'xls';
-        $os = $this->Relatorios_model->osCustom($dataInicial, $dataFinal, $cliente, $responsavel, $status, $isXls);
-        $totalProdutos = 0;
-        $totalServicos = 0;
-        foreach ($os as $o) {
-            $totalProdutos += $isXls
-                ? floatval($o['total_produto'])
-                : floatval($o->total_produto);
-            $totalServicos += $isXls
-                ? floatval($o['total_servico'])
-                : floatval($o->total_servico);
-        }
-
-        if ($isXls) {
-            $osFormatadas = array_map(function ($item) {
-                $total = floatval($item['total_servico']) + floatval($item['total_produto']);
-
-                return [
-                    'idOs' => $item['idOs'],
-                    'nomeCliente' => $item['nomeCliente'],
-                    'status' => $item['status'],
-                    'dataFinal' => $item['dataInicial'],
-                    'descricaoProduto' => $item['descricaoProduto'],
-                    'total_produto' => $item['total_produto'] ? $item['total_produto'] : 0,
-                    'total_servico' => $item['total_servico'] ? $item['total_servico'] : 0,
-                    'valorTotal' => $total ? $total : 0,
-                ];
-            }, $os);
-
-            $cabecalho = [
-                'ID OS' => 'integer',
-                'Cliente' => 'string',
-                'Status' => 'string',
-                'Data' => 'YYYY-MM-DD',
-                'Descrição' => 'string',
-                'Total Produtos' => 'price',
-                'Total Serviços' => 'price',
-                'Total' => 'price',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($osFormatadas as $os) {
-                $writer->writeSheetRow('Sheet1', $os);
-            }
-            $writer->writeSheetRow('Sheet1', []);
-            $writer->writeSheetRow('Sheet1', [
-                null,
-                null,
-                null,
-                null,
-                null,
-                $totalProdutos,
-                $totalServicos,
-                $totalProdutos + $totalServicos,
-            ]);
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_os_custom.xlsx', $arquivo);
-
-            return;
-        }
 
         $this->load->helper('mpdf');
 
         $title = $status == null ? 'Todas' : $status;
         $user = $responsavel == null ? 'Não foi selecionado' : $this->Usuarios_model->get(1, intval($responsavel) - 1);
 
+        $os = $this->Relatorios_model->osCustom($dataInicial, $dataFinal, $cliente, $responsavel, $status);
         $emitente = $this->Mapos_model->getEmitente();
         $usuario = is_array($user) ? $user[0]->nome : $user;
 
         $data['title'] = 'Relatório de OS - ' . $title;
         $data['os'] = $os;
-        $data['total_produtos'] = $totalProdutos;
-        $data['total_servicos'] = $totalServicos;
-        $data['total_geral'] = $totalProdutos + $totalServicos;
         $data['res_nome'] = $usuario;
 
         $data['dataInicial'] = $dataInicial != null ? date('d-m-Y', strtotime($dataInicial)) : 'indefinida';
@@ -578,51 +288,6 @@ class Relatorios extends MY_Controller
             redirect(base_url());
         }
 
-        $format = $this->input->get('format');
-
-        if ($format == 'xls') {
-            $lancamentos = $this->Relatorios_model->financeiroRapid(true);
-
-            $lancamentosFormatados = array_map(function ($item) {
-                return [
-                    'idLancamentos' => $item['idLancamentos'],
-                    'descricao' => $item['descricao'],
-                    'valor' => $item['valor'],
-                    'data_vencimento' => $item['data_vencimento'],
-                    'data_pagamento' => $item['data_pagamento'],
-                    'baixado' => $item['baixado'],
-                    'cliente_fornecedor' => $item['cliente_fornecedor'],
-                    'forma_pgto' => $item['forma_pgto'],
-                    'tipo' => $item['tipo'],
-                ];
-            }, $lancamentos);
-
-            $cabecalho = [
-                'ID Lançamentos' => 'integer',
-                'Descricao' => 'string',
-                'Valor' => 'price',
-                'Data Vencimento' => 'YYYY-MM-DD',
-                'Data Pagamento' => 'YYYY-MM-DD',
-                'Baixado' => 'integer',
-                'Cliente/Fornecedor' => 'string',
-                'Forma Pagamento' => 'string',
-                'Tipo' => 'string',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($lancamentosFormatados as $lancamento) {
-                $writer->writeSheetRow('Sheet1', $lancamento);
-            }
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_financeiro.xlsx', $arquivo);
-
-            return;
-        }
-
         $data['lancamentos'] = $this->Relatorios_model->financeiroRapid();
         $data['emitente'] = $this->Mapos_model->getEmitente();
         $data['title'] = 'Relatório Financeiro';
@@ -644,50 +309,6 @@ class Relatorios extends MY_Controller
         $dataFinal = $this->input->get('dataFinal');
         $tipo = $this->input->get('tipo');
         $situacao = $this->input->get('situacao');
-        $format = $this->input->get('format');
-
-        if ($format == 'xls') {
-            $lancamentos = $this->Relatorios_model->financeiroCustom($dataInicial, $dataFinal, $tipo, $situacao, true);
-
-            $lancamentosFormatados = array_map(function ($item) {
-                return [
-                    'idLancamentos' => $item['idLancamentos'],
-                    'descricao' => $item['descricao'],
-                    'valor' => $item['valor'],
-                    'data_vencimento' => $item['data_vencimento'],
-                    'data_pagamento' => $item['data_pagamento'],
-                    'baixado' => $item['baixado'],
-                    'cliente_fornecedor' => $item['cliente_fornecedor'],
-                    'forma_pgto' => $item['forma_pgto'],
-                    'tipo' => $item['tipo'],
-                ];
-            }, $lancamentos);
-
-            $cabecalho = [
-                'ID Lançamentos' => 'integer',
-                'Descricao' => 'string',
-                'Valor' => 'price',
-                'Data Vencimento' => 'YYYY-MM-DD',
-                'Data Pagamento' => 'YYYY-MM-DD',
-                'Baixado' => 'integer',
-                'Cliente/Fornecedor' => 'string',
-                'Forma Pagamento' => 'string',
-                'Tipo' => 'string',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($lancamentosFormatados as $lancamento) {
-                $writer->writeSheetRow('Sheet1', $lancamento);
-            }
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_financeiro_custom.xlsx', $arquivo);
-
-            return;
-        }
 
         $data['lancamentos'] = $this->Relatorios_model->financeiroCustom($dataInicial, $dataFinal, $tipo, $situacao);
         $data['emitente'] = $this->Mapos_model->getEmitente();
@@ -716,57 +337,9 @@ class Relatorios extends MY_Controller
             $this->session->set_flashdata('error', 'Você não tem permissão para gerar relatórios de vendas.');
             redirect(base_url());
         }
-
-        $format = $this->input->get('format');
-        $isXls = $format === 'xls';
-        $vendas = $this->Relatorios_model->vendasRapid($isXls);
-        $totalVendas = 0;
-        foreach ($vendas as $venda) {
-            $totalVendas += $isXls
-                ? floatval($venda['valorTotal'])
-                : floatval($venda->valorTotal);
-        }
-
-        if ($format == 'xls') {
-            $vendasFormatadas = array_map(function ($item) {
-                return [
-                    'cliente' => $item['nomeCliente'],
-                    'total' => $item['valorTotal'] ?: 0,
-                    'data' => $item['dataVenda'],
-                    'vendedor' => $item['nome'],
-                ];
-            }, $vendas);
-
-            $cabecalho = [
-                'Cliente' => 'string',
-                'Total' => 'price',
-                'Data' => 'YYYY-MM-DD',
-                'Vendedor' => 'string',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($vendasFormatadas as $venda) {
-                $writer->writeSheetRow('Sheet1', $venda);
-            }
-            $writer->writeSheetRow('Sheet1', []);
-            $writer->writeSheetRow('Sheet1', [
-                null,
-                $totalVendas,
-            ]);
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_vendas.xlsx', $arquivo);
-
-            return;
-        }
-
-        $data['vendas'] = $vendas;
-        $data['total_vendas'] = $totalVendas;
+        $data['vendas'] = $this->Relatorios_model->vendasRapid();
         $data['emitente'] = $this->Mapos_model->getEmitente();
-        $data['title'] = 'Relatório de Vendas Rápido';
+        $data['title'] = 'Relatório de Clientes Custumizado';
         $data['topo'] = $this->load->view('relatorios/imprimir/imprimirTopo', $data, true);
 
         $this->load->helper('mpdf');
@@ -784,57 +357,10 @@ class Relatorios extends MY_Controller
         $dataFinal = $this->input->get('dataFinal');
         $cliente = $this->input->get('cliente');
         $responsavel = $this->input->get('responsavel');
-        $format = $this->input->get('format');
 
-        $isXls = $format === 'xls';
-        $vendas = $this->Relatorios_model->vendasCustom($dataInicial, $dataFinal, $cliente, $responsavel, $isXls);
-        $totalVendas = 0;
-        foreach ($vendas as $venda) {
-            $totalVendas += $isXls
-                ? floatval($venda['valorTotal'])
-                : floatval($venda->valorTotal);
-        }
-
-        if ($format == 'xls') {
-            $vendasFormatadas = array_map(function ($item) {
-                return [
-                    'cliente' => $item['nomeCliente'],
-                    'total' => $item['valorTotal'] ?: 0,
-                    'data' => $item['dataVenda'],
-                    'vendedor' => $item['nome'],
-                ];
-            }, $vendas);
-
-            $cabecalho = [
-                'Cliente' => 'string',
-                'Total' => 'price',
-                'Data' => 'YYYY-MM-DD',
-                'Vendedor' => 'string',
-            ];
-
-            $writer = new XLSXWriter();
-
-            $writer->writeSheetHeader('Sheet1', $cabecalho);
-            foreach ($vendasFormatadas as $venda) {
-                $writer->writeSheetRow('Sheet1', $venda);
-            }
-            $writer->writeSheetRow('Sheet1', []);
-            $writer->writeSheetRow('Sheet1', [
-                null,
-                $totalVendas,
-            ]);
-
-            $arquivo = $writer->writeToString();
-            $this->load->helper('download');
-            force_download('relatorio_vendas.xlsx', $arquivo);
-
-            return;
-        }
-
-        $data['vendas'] = $vendas;
-        $data['total_vendas'] = $totalVendas;
+        $data['vendas'] = $this->Relatorios_model->vendasCustom($dataInicial, $dataFinal, $cliente, $responsavel);
         $data['emitente'] = $this->Mapos_model->getEmitente();
-        $data['title'] = 'Relatório de Vendas Customizado';
+        $data['title'] = 'Relatório de Vendas Custumizado';
         $data['topo'] = $this->load->view('relatorios/imprimir/imprimirTopo', $data, true);
 
         $this->load->helper('mpdf');

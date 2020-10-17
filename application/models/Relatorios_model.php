@@ -81,15 +81,11 @@ class Relatorios_model extends CI_Model
         return $this->db->query($query, [$dataInicial, $dataFinal])->result();
     }
 
-    public function clientesRapid($array = false)
+    public function clientesRapid()
     {
         $this->db->order_by('nomeCliente', 'asc');
 
-        $result = $this->db->get('clientes');
-        if ($array) {
-            return $result->result_array();
-        }
-        return $result->result();
+        return $this->db->get('clientes')->result();
     }
 
     public function produtosRapid()
@@ -102,7 +98,7 @@ class Relatorios_model extends CI_Model
     public function produtosRapidMin()
     {
         $this->db->order_by('descricao', 'asc');
-        $this->db->where('estoque <= estoqueMinimo');
+        $this->db->where('estoque < estoqueMinimo');
 
         return $this->db->get('produtos')->result();
     }
@@ -131,82 +127,6 @@ class Relatorios_model extends CI_Model
         return $this->db->query($query)->result();
     }
 
-    public function skuRapid($array = false)
-    {
-        $this->db->select('clientes.idClientes, clientes.nomeCliente, produtos.idProdutos, produtos.descricao, itens_de_vendas.quantidade, vendas.idVendas as idRelacionado, vendas.dataVenda as dataOcorrencia, itens_de_vendas.preco, (itens_de_vendas.preco * itens_de_vendas.quantidade) as precoTotal, "venda" as origem');
-        $this->db->from('vendas');
-        $this->db->join('itens_de_vendas', 'vendas.idVendas = itens_de_vendas.vendas_id');
-        $this->db->join('clientes', 'clientes.idClientes = vendas.clientes_id');
-        $this->db->join('produtos', 'produtos.idProdutos = itens_de_vendas.produtos_id');
-        $subQuery1 = $this->db->get_compiled_select();
-        $this->db->reset_query();
-
-        $this->db->select('clientes.idClientes, clientes.nomeCliente, produtos.idProdutos, produtos.descricao, produtos_os.quantidade, os.idOs as idRelacionado, os.dataInicial as dataOcorrencia, produtos_os.preco , (produtos_os.preco * produtos_os.quantidade) as precoTotal, "os" as origem');
-        $this->db->from('os');
-        $this->db->join('produtos_os', 'produtos_os.os_id = os.idOs');
-        $this->db->join('clientes', 'clientes.idClientes = os.clientes_id');
-        $this->db->join('produtos', 'produtos.idProdutos = produtos_os.produtos_id');
-        $subQuery2 = $this->db->get_compiled_select();
-        $this->db->reset_query();
-
-        $query = $this->db->query("SELECT * FROM ($subQuery1 UNION $subQuery2) as result ORDER BY dataOcorrencia DESC");
-        if ($array) {
-            return $query->result_array();
-        }
-
-        return $query->result();
-    }
-
-    public function skuCustom($dataInicial = null, $dataFinal = null, $cliente = null, $origem = null, $array = false)
-    {
-        $this->db->select('clientes.idClientes, clientes.nomeCliente, produtos.idProdutos, produtos.descricao, itens_de_vendas.quantidade, vendas.idVendas as idRelacionado, vendas.dataVenda as dataOcorrencia, itens_de_vendas.preco, (itens_de_vendas.preco * itens_de_vendas.quantidade) as precoTotal, "venda" as origem');
-        $this->db->from('vendas');
-        $this->db->join('itens_de_vendas', 'vendas.idVendas = itens_de_vendas.vendas_id');
-        $this->db->join('clientes', 'clientes.idClientes = vendas.clientes_id');
-        $this->db->join('produtos', 'produtos.idProdutos = itens_de_vendas.produtos_id');
-        $subQuery1 = $this->db->get_compiled_select();
-        $this->db->reset_query();
-
-        $this->db->select('clientes.idClientes, clientes.nomeCliente, produtos.idProdutos, produtos.descricao, produtos_os.quantidade, os.idOs as idRelacionado, os.dataInicial as dataOcorrencia, produtos_os.preco , (produtos_os.preco * produtos_os.quantidade) as precoTotal, "os" as origem');
-        $this->db->from('os');
-        $this->db->join('produtos_os', 'produtos_os.os_id = os.idOs');
-        $this->db->join('clientes', 'clientes.idClientes = os.clientes_id');
-        $this->db->join('produtos', 'produtos.idProdutos = produtos_os.produtos_id');
-        $subQuery2 = $this->db->get_compiled_select();
-        $this->db->reset_query();
-
-        $query = "
-            CREATE TEMPORARY TABLE IF NOT EXISTS results
-            (SELECT * FROM ($subQuery1 UNION $subQuery2) as unionTable)
-        ";
-        $this->db->query($query);
-
-        $this->db->from("results");
-        $this->db->order_by("dataOcorrencia", "desc");
-        if ($dataInicial) {
-            $this->db->where('dataOcorrencia >=', $dataInicial);
-        }
-
-        if ($dataFinal) {
-            $this->db->where('dataOcorrencia <=', $dataFinal);
-        }
-
-        if ($cliente) {
-            $this->db->where('idClientes =', $cliente);
-        }
-
-        if ($origem) {
-            $this->db->where('origem =', $origem);
-        }
-
-        $result = $this->db->get();
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
-    }
-
     public function servicosRapid()
     {
         $this->db->order_by('nome', 'asc');
@@ -221,7 +141,7 @@ class Relatorios_model extends CI_Model
         return $this->db->query($query, [$precoInicial, $precoFinal])->result();
     }
 
-    public function osRapid($array = false)
+    public function osRapid()
     {
         $query = 'CREATE TEMPORARY TABLE IF NOT EXISTS total_produtos SELECT SUM(subTotal) as total_produto, os_id FROM produtos_os GROUP BY os_id; ';
         $this->db->query($query);
@@ -236,15 +156,10 @@ class Relatorios_model extends CI_Model
         $this->db->join('total_servicos', 'total_servicos.os_id = os.idOs', 'left');
         $this->db->order_by('os.dataInicial', 'DESC');
 
-        $result = $this->db->get();
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
+        return $this->db->get()->result();
     }
 
-    public function osCustom($dataInicial = null, $dataFinal = null, $cliente = null, $responsavel = null, $status = null, $array = false)
+    public function osCustom($dataInicial = null, $dataFinal = null, $cliente = null, $responsavel = null, $status = null)
     {
         $whereData = "";
         $whereCliente = "";
@@ -278,31 +193,19 @@ class Relatorios_model extends CI_Model
                    WHERE idOs != 0 $whereData $whereCliente $whereResponsavel $whereStatus
                    ORDER BY os.dataInicial";
 
-        $result = $this->db->query($query);
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
+        return $this->db->query($query)->result();
     }
 
-    public function financeiroRapid($array = false)
+    public function financeiroRapid()
     {
-        $primeiroDiaMes = new \DateTime('first day of this month');
-        $ultimodiaMes = new DateTime('last day of this month');
+        $dataInicial = date('Y-m-01');
+        $dataFinal = date("Y-m-t");
+        $query = "SELECT * FROM lancamentos WHERE data_vencimento BETWEEN ? and ? ORDER BY tipo";
 
-        $this->db->where('data_vencimento >=', $primeiroDiaMes->format('Y-m-d'));
-        $this->db->where('data_vencimento <=', $ultimodiaMes->format('Y-m-d'));
-        $this->db->order_by('data_vencimento', 'asc');
-        $result = $this->db->get('lancamentos');
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
+        return $this->db->query($query, [$dataInicial, $dataFinal])->result();
     }
 
-    public function financeiroCustom($dataInicial = null, $dataFinal = null, $tipo = null, $situacao = null, $array = false)
+    public function financeiroCustom($dataInicial = null, $dataFinal = null, $tipo = null, $situacao = null)
     {
         if ($dataInicial) {
             $this->db->where('data_vencimento >=', $dataInicial);
@@ -325,32 +228,22 @@ class Relatorios_model extends CI_Model
             }
         }
 
-        $this->db->order_by('data_vencimento', 'asc');
-        $result = $this->db->get('lancamentos');
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
+        return $this->db->get('lancamentos')->result();
     }
 
-    public function vendasRapid($array = false)
+    public function vendasRapid()
     {
         $this->db->select('vendas.*,clientes.nomeCliente, usuarios.nome');
         $this->db->from('vendas');
         $this->db->join('clientes', 'clientes.idClientes = vendas.clientes_id');
         $this->db->join('usuarios', 'usuarios.idUsuarios = vendas.usuarios_id');
+
         $this->db->order_by('vendas.dataVenda', 'DESC');
 
-        $result = $this->db->get();
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
+        return $this->db->get()->result();
     }
 
-    public function vendasCustom($dataInicial = null, $dataFinal = null, $cliente = null, $responsavel = null, $array = false)
+    public function vendasCustom($dataInicial = null, $dataFinal = null, $cliente = null, $responsavel = null)
     {
         $whereData = "";
         $whereCliente = "";
@@ -369,13 +262,8 @@ class Relatorios_model extends CI_Model
             $whereResponsavel = "AND usuarios_id = " . $this->db->escape($responsavel);
         }
 
-        $query = "SELECT vendas.*,clientes.nomeCliente,usuarios.nome FROM vendas LEFT JOIN clientes ON vendas.clientes_id = clientes.idClientes LEFT JOIN usuarios ON vendas.usuarios_id = usuarios.idUsuarios WHERE idVendas != 0 $whereData $whereCliente $whereResponsavel ORDER BY vendas.dataVenda";
+        $query = "SELECT vendas.*,clientes.nomeCliente,usuarios.nome FROM vendas LEFT JOIN clientes ON vendas.clientes_id = clientes.idClientes LEFT JOIN usuarios ON vendas.usuarios_id = usuarios.idUsuarios WHERE idVendas != 0 $whereData $whereCliente $whereResponsavel ORDER BY vendas.dataVEnda";
 
-        $result = $this->db->query($query);
-        if ($array) {
-            return $result->result_array();
-        }
-
-        return $result->result();
+        return $this->db->query($query)->result();
     }
 }

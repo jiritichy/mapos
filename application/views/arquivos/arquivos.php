@@ -33,7 +33,7 @@
             </span>
             <h5>Arquivos</h5>
         </div>
-        <div class="widget-content nopadding tab-content">
+        <div class="widget-content nopadding">
             <table width="100%" class="table table-bordered ">
                 <thead>
                     <tr>
@@ -59,7 +59,7 @@
                         <tr>
                             <td><?= $r->idDocumentos ?></td>
                             <td>
-                                <?php if (@getimagesize($r->path)): ?>
+                                <?php if (getimagesize($r->path)): ?>
                                     <a href="<?= $r->url ?>"> <img src="<?= $r->url ?> "></a>
                                 <?php else: ?>
                                     <span>-</span>

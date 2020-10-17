@@ -26,7 +26,7 @@
                         </h4>
                         <br>
                     </div>
-                    <div class="widget-content nopadding tab-content">
+                    <div class="widget-content nopadding">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
